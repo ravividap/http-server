@@ -21,17 +21,27 @@ while (client.Connected)
 
     var request = message.Split("\r\n")[0];
 
-    var path = request.Split("/")[1];
+    var path = request.Split(" ")[1];
 
-    path = path.Split(" ")[0];
-    if(path != "")
+    Console.WriteLine($"path 0: {path}");
+
+
+    var param = path.Split("/");
+
+    Console.WriteLine($"param 0: {param[0]}");
+    Console.WriteLine($"param 1: {param[1]}");
+
+    if (param.Length == 2 && param[1] == "")
     {
-        Console.WriteLine($"Path: {path}");
-        client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 404 Not Found\r\n\r\n"));
+        client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 200 OK\r\n\r\n"));
+
     }
     else
     {
-        client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 200 OK\r\n\r\n"));
+        if (param[1] != "echo")
+            client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 404 Not Found\r\n\r\n"));
+        else
+            client.Send(Encoding.UTF8.GetBytes($"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {param[2].Length}\r\n\r\n{param[2]}\r\n"));
     }
-
 }
+
