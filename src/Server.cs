@@ -10,5 +10,28 @@ TcpListener server = new TcpListener(IPAddress.Any, 4221);
 server.Start();
 var client = server.AcceptSocket(); // wait for client
 
-client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 200 OK\r\n\r\n"));
+var buffer = new byte[1024];
 
+while (client.Connected)
+{
+
+    var bytes = client.Receive(buffer, SocketFlags.None);
+
+    var message = Encoding.UTF8.GetString(buffer);
+
+    var request = message.Split("\r\n")[0];
+
+    var path = request.Split("/")[1];
+
+    path = path.Split(" ")[0];
+    if(path != "")
+    {
+        Console.WriteLine($"Path: {path}");
+        client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 404 Not Found\r\n\r\n"));
+    }
+    else
+    {
+        client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 200 OK\r\n\r\n"));
+    }
+
+}
