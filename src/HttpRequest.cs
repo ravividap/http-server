@@ -16,7 +16,7 @@ public class HttpRequest
     public string Body { get; set; }
 
 
-    public static HttpRequest Parse(Socket client)
+    public static HttpRequest? Parse(Socket client)
     {
         var buffer = new byte[1024];
         int bytesRead = client.Receive(buffer, SocketFlags.None);
