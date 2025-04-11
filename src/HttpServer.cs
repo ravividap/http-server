@@ -37,7 +37,7 @@ public class HttpServer
             {
                 // Wait for a client to connect
                 var client = _listener.AcceptSocket();
-                ProcessClientRequest(client);
+               Task.Run(() => ProcessClientRequest(client));
             }
         }
         catch (Exception ex)
