@@ -21,6 +21,16 @@ while (client.Connected)
 
     var request = message.Split("\r\n")[0];
 
+    var userAgentHeader = message.Split("\r\n")[2];
+
+    string userAgentValue = string.Empty;
+    if (!string.IsNullOrEmpty(userAgentHeader))
+    {
+        userAgentValue = userAgentHeader.Split(": ")[1];
+    }
+
+    Console.WriteLine($" use agent: {userAgentHeader}");
+
     var path = request.Split(" ")[1];
 
     Console.WriteLine($"path 0: {path}");
@@ -38,10 +48,20 @@ while (client.Connected)
     }
     else
     {
-        if (param[1] != "echo")
-            client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 404 Not Found\r\n\r\n"));
-        else
-            client.Send(Encoding.UTF8.GetBytes($"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {param[2].Length}\r\n\r\n{param[2]}\r\n"));
+        switch (param[1])
+        {
+            case "echo":
+                client.Send(Encoding.UTF8.GetBytes($"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {param[2].Length}\r\n\r\n{param[2]}\r\n"));
+                break;
+
+            case "user-agent":
+                client.Send(Encoding.UTF8.GetBytes($"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {userAgentValue.Length}\r\n\r\n{userAgentValue}\r\n"));
+                break;
+            default:
+                client.Send(Encoding.UTF8.GetBytes("HTTP/1.1 404 Not Found\r\n\r\n"));
+                break;
+        }
+            
     }
 }
 
