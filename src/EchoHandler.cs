@@ -12,7 +12,9 @@ public class EchoHandler : IRequestHandler
         var useCompression = false;
         if (request.Headers.ContainsKey("accept-encoding"))
         {
-            useCompression = request.Headers["accept-encoding"] == "gzip" ? true : false;
+            var encodings = request.Headers["accept-encoding"].Split(", ");
+
+             useCompression = encodings.Contains("gzip") ? true : false;
 
             Console.WriteLine($"use comp: {useCompression}");
         }
