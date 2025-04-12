@@ -10,22 +10,38 @@ public class FilesHandler(string directory) : IRequestHandler
 
         Console.WriteLine($"file: {fileName}");
 
+
         string fullPath = Path.Combine(directory, fileName);
 
-        if (File.Exists(fullPath))
+        if(request.Method == "GET")
         {
-            var contents = File.ReadAllText(fullPath);
-            if (contents != null)
+            if (File.Exists(fullPath))
             {
-                return new HttpResponse
+                var contents = File.ReadAllText(fullPath);
+                if (contents != null)
                 {
-                    StatusCode = 200,
-                    StatusMessage = "OK",
-                    Headers = { ["Content-Type"] = "application/octet-stream" },
-                    Body = contents
-                };
+                    return new HttpResponse
+                    {
+                        StatusCode = 200,
+                        StatusMessage = "OK",
+                        Headers = { ["Content-Type"] = "application/octet-stream" },
+                        Body = contents
+                    };
+                }
             }
         }
+
+        if(request.Method == "POST")
+        {
+            File.WriteAllText(fullPath, request.Body);
+
+            return new HttpResponse
+            {
+                StatusCode = 201,
+                StatusMessage = "Created"
+            };
+        }
+        
 
         return new HttpResponse
         {
