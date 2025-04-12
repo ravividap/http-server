@@ -98,5 +98,10 @@ public class HttpServer
     {
         byte[] responseBytes = response.ToByteArray();
         client.Send(responseBytes, SocketFlags.None);
+        
+        if (response.Headers.ContainsKey("Connection") && response.Headers["Connection"] == "close")
+        {
+            client.Disconnect(true);
+        }
     }
 }

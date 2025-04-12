@@ -1,4 +1,6 @@
-﻿namespace codecrafters_http_server.src;
+﻿using System.Reflection.PortableExecutable;
+
+namespace codecrafters_http_server.src;
 
 public class UserAgentHandler : IRequestHandler
 {
@@ -13,11 +15,18 @@ public class UserAgentHandler : IRequestHandler
             userAgent = value;
         }
 
+        var headers = new Dictionary<string, string> { ["Content-Type"] = "text/plain" };
+        
+        if (request.Headers.ContainsKey("Connection"))
+        {
+            headers.Add("Connection", "close");
+        } 
+
         return new HttpResponse
         {
             StatusCode = 200,
             StatusMessage = "OK",
-            Headers = { ["Content-Type"] = "text/plain" },
+            Headers = headers,
             Body = userAgent
         };
     }

@@ -19,12 +19,19 @@ public class EchoHandler : IRequestHandler
             Console.WriteLine($"use compre: {useCompression}");
         }
 
+        var headers = new Dictionary<string, string> { ["Content-Type"] = "text/plain" };
+
+        if (request.Headers.ContainsKey("Connection"))
+        {
+            headers.Add("Connection", "close");
+
+        }
 
         return new HttpResponse
         {
             StatusCode = 200,
             StatusMessage = "OK",
-            Headers = { ["Content-Type"] = "text/plain" },
+            Headers = headers,
             Body = content,
             UseCompression = useCompression
         };
