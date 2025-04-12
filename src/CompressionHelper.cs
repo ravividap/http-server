@@ -9,12 +9,16 @@ public static class CompressionHelper
     {
         using (var memoryStream = new MemoryStream())
         {
-            using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+            using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress, true))
             {
-                using (var writer = new StreamWriter(gzipStream, Encoding.UTF8))
-                {
-                    writer.Write(data);
-                }
+                // Convert string to bytes first to avoid any encoding issues/BOMs
+                byte[] bytes = Encoding.UTF8.GetBytes(data);
+                gzipStream.Write(bytes, 0, bytes.Length);
+
+                //using (var writer = new StreamWriter(gzipStream, Encoding.UTF8))
+                //{
+                //    writer.Write(data);
+                //}
             }
 
             return memoryStream.ToArray();
