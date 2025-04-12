@@ -13,18 +13,35 @@ public class HttpResponse
     public Dictionary<string, string> Headers { get; set; } = new();
     public string Body { get; set; }
 
+    public bool UseCompression { get; set; }
+
     public byte[] ToByteArray()
     {
+        byte[] bodyBytes = null;
+
+        if (!string.IsNullOrEmpty(Body))
+        {
+            if (UseCompression)
+            {
+                // Compress the body
+                bodyBytes = CompressionHelper.CompressWithGzip(Body);
+                Body = Encoding.UTF8.GetString(bodyBytes);
+                Headers["Content-Encoding"] = "gzip";
+                Headers["Content-Length"] = bodyBytes.Length.ToString();
+                Headers["Vary"] = "Accept-Encoding";  // Best practice with content negotiation
+            }
+            else
+            {
+                bodyBytes = Encoding.UTF8.GetBytes(Body);
+                Headers["Content-Length"] = bodyBytes.Length.ToString();
+            }
+        }
+
+
         var responseBuilder = new StringBuilder();
 
         // Status line
         responseBuilder.Append($"HTTP/1.1 {StatusCode} {StatusMessage}\r\n");
-
-        // Add content length header if body exists and no content length header is present
-        if (!string.IsNullOrEmpty(Body) && !Headers.ContainsKey("Content-Length"))
-        {
-            Headers["Content-Length"] = Body.Length.ToString();
-        }
 
         // Headers
         foreach (var header in Headers)
