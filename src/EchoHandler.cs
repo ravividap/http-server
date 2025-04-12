@@ -15,8 +15,6 @@ public class EchoHandler : IRequestHandler
             var encodings = request.Headers["accept-encoding"].Split(", ");
 
              useCompression = encodings.Contains("gzip") ? true : false;
-
-            Console.WriteLine($"use comp: {useCompression}");
         }
 
 
